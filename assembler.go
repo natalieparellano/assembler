@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/natalieparellano/assembler/code"
+	"github.com/natalieparellano/assembler/hackfile"
 	"github.com/natalieparellano/assembler/parser"
 )
 
@@ -22,7 +21,7 @@ func main() {
 		instruction := instructions[i]
 		var res string
 		if instruction.Class == "L" {
-			continue // TODO: implement labels
+			continue
 		} else if instruction.Class == "A" {
 			val, err := strconv.Atoi(instruction.Symbol)
 			check(err)
@@ -34,46 +33,14 @@ func main() {
 		ret += res
 	}
 
-	newpath := newPath(path)
-	writeFile(newpath, ret)
+	newpath := hackfile.NewPath(path, "asm", "hack")
+	hackfile.WriteFile(newpath, ret)
 }
 
 func check(e error) {
 	if e != nil {
 		panic(e)
 	}
-}
-
-func newPath(path string) string {
-	fmt.Printf("path: %s\n", path)
-
-	dir := filepath.Dir(path)
-	fmt.Printf("dir: %s\n", dir)
-
-	oldfile := filepath.Base(path)
-	fmt.Printf("oldfile: %s\n", oldfile)
-
-	newfile := strings.Replace(oldfile, "asm", "hack", 1)
-	fmt.Printf("newfile: %s\n", newfile)
-
-	newpath := filepath.Join(dir, newfile)
-	fmt.Printf("newpath: %s\n", newpath)
-
-	return newpath
-}
-
-func writeFile(path, str string) {
-	f, err := os.Create(path)
-	check(err)
-
-	_, err = f.WriteString(str)
-	check(err)
-
-	err = f.Sync()
-	check(err)
-
-	err = f.Close()
-	check(err)
 }
 
 func zeroPad(val string) string {
